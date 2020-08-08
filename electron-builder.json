@@ -19,6 +19,7 @@
     "!tsconfig.json",
     "!tslint.json"
   ],
+  "asarUnpack": ["tools/"],
   "win": {
     "icon": "dist/assets/icons",
     "target": ["portable"]

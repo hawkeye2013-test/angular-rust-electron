@@ -63,8 +63,7 @@ exeDirs.forEach((exeDir) => {
 
         let toEXE = path.join(
           cwd,
-          'dist',
-          'executables',
+          'tools',
           cargoFileContents.package.name + '.exe'
         );
 

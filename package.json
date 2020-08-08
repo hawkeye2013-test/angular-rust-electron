@@ -1,36 +1,59 @@
 {
   "name": "angular-rust-electron",
   "version": "0.0.0",
+  "description": "Angular 10 with Electron and Rust",
+  "homepage": "https://github.com/hawkeye2013/angular-rust-electron",
+  "author": {
+    "name": "Tucker Hawkinson",
+    "email": "hawkinson.npm@gmail.com"
+  },
+  "main": "main.js",
+  "keywords": [
+    "angular",
+    "angular 10",
+    "rust",
+    "electron",
+    "typescript"
+  ],
   "scripts": {
+    "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "start": "npm-run-all -p electron:serve ng:serve",
+    "build": "npm run electron:serve-tsc && ng build --base-href ./",
+    "build:dev": "npm run build -- -c dev",
+    "build:prod": "npm run build -- -c production",
+    "ng:serve": "ng serve",
+    "ng:serve:web": "ng serve -c web -o",
+    "electron:serve-tsc": "tsc -p tsconfig-serve.json",
+    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --serve",
+    "electron:local": "npm run build:prod && npx electron .",
+    "electron:build": "npm run build:prod && electron-builder build",
+    "test": "ng test --watch=false",
+    "test:watch": "ng test",
+    "e2e": "npm run build:prod && cross-env TS_NODE_PROJECT='e2e/tsconfig.e2e.json' mocha --timeout 300000 --require ts-node/register e2e/**/*.e2e.ts",
+    "lint": "ng lint"
   },
   "private": true,
-  "dependencies": {
+  "devDependencies": {
+    "@angular-devkit/build-angular": "~0.1000.2",
     "@angular/animations": "~10.0.3",
+    "@angular/cli": "~10.0.2",
     "@angular/common": "~10.0.3",
     "@angular/compiler": "~10.0.3",
+    "@angular/compiler-cli": "~10.0.3",
     "@angular/core": "~10.0.3",
     "@angular/forms": "~10.0.3",
     "@angular/platform-browser": "~10.0.3",
     "@angular/platform-browser-dynamic": "~10.0.3",
     "@angular/router": "~10.0.3",
-    "rxjs": "~6.5.5",
-    "tslib": "^2.0.0",
-    "zone.js": "~0.10.3"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "~0.1000.2",
-    "@angular/cli": "~10.0.2",
-    "@angular/compiler-cli": "~10.0.3",
-    "@types/node": "^12.11.1",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
+    "cross-env": "^7.0.2",
+    "electron": "^9.2.0",
+    "electron-builder": "^22.8.0",
+    "electron-reload": "^1.5.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~5.0.0",
@@ -38,9 +61,17 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~3.3.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+    "npm-run-all": "^4.1.5",
     "protractor": "~7.0.0",
+    "rxjs": "~6.5.5",
     "ts-node": "~8.3.0",
+    "tslib": "^2.0.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.9.5"
+    "typescript": "~3.9.5",
+    "wait-on": "^5.1.0",
+    "zone.js": "~0.10.3"
+  },
+  "engines": {
+    "node": ">=10.13.0"
   }
 }

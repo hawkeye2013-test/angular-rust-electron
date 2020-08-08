@@ -56,6 +56,20 @@ export default class App {
             })
           );
           break;
+
+        case 'darwin':
+          App.mainWindow.loadURL(
+            url.format({
+              pathname: path.join(
+                App.application.getAppPath(),
+                'dist',
+                'index.html'
+              ),
+              protocol: 'file:',
+              slashes: true,
+            })
+          );
+          break;
       }
     }
     App.mainWindow.on('closed', App.onClose);

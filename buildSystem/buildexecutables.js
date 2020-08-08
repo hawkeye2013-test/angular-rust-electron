@@ -11,8 +11,12 @@ const exePath = path.join(cwd, 'executables');
 
 const exeDirs = fs.readdirSync(exePath);
 
+const platform = process.platform;
+
+console.log('PLATFORM: ', platform);
+
 // make the destination directory
-fs.mkdirSync(path.join(process.cwd(), 'dist', 'executables'));
+// fs.mkdirSync(path.join(process.cwd(), 'dist', 'executables'));
 
 exeDirs.forEach((exeDir) => {
   let configPath = path.join(exePath, exeDir, 'config.json');
@@ -34,6 +38,7 @@ exeDirs.forEach((exeDir) => {
           path.join(exePath, exeDir, 'Cargo.toml')
         );
 
+        console.log('Made it here');
         // Build EXE
         let process = execSync(
           `cargo build --release --manifest-path=${path.join(
@@ -48,27 +53,58 @@ exeDirs.forEach((exeDir) => {
             if (stderr) {
               console.log('STDERR: ', stderr);
             }
-            console.log(stdout);
+            if (stdout) {
+              console.log(stdout);
+            }
           }
         );
 
-        // Copy EXE to dist directory
-        let targetEXE = path.join(
-          exePath,
-          exeDir,
-          'target',
-          'release',
-          cargoFileContents.package.name + '.exe'
-        );
+        switch (platform) {
+          case 'win32':
+            // Copy EXE to dist directory
+            let targetEXEwin = path.join(
+              exePath,
+              exeDir,
+              'target',
+              'release',
+              cargoFileContents.package.name + '.exe'
+            );
 
-        let toEXE = path.join(
-          cwd,
-          'tools',
-          cargoFileContents.package.name + '.exe'
-        );
+            let toEXEwin = path.join(
+              cwd,
+              'tools',
+              cargoFileContents.package.name + '.exe'
+            );
 
-        console.log(`INFO: Copying File from ${targetEXE} to ${toEXE}`);
-        let copySuccess = fs.copyFileSync(targetEXE, toEXE);
+            console.log(
+              `INFO: Copying File from ${targetEXEwin} to ${toEXEwin}`
+            );
+            fs.copyFileSync(targetEXEwin, toEXEwin);
+            break;
+
+          case 'darwin':
+            // Copy Executable to dist directory
+            let targetEXEmac = path.join(
+              exePath,
+              exeDir,
+              'target',
+              'release',
+              cargoFileContents.package.name
+            );
+
+            let toEXEmac = path.join(
+              cwd,
+              'tools',
+              cargoFileContents.package.name
+            );
+
+            console.log(
+              `INFO: Copying File from ${targetEXEmac} to ${toEXEmac}`
+            );
+            fs.copyFileSync(targetEXEmac, toEXEmac);
+
+            break;
+        }
 
         break;
     }

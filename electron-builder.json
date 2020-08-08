@@ -25,7 +25,7 @@
     "target": ["portable"]
   },
   "mac": {
-    "icon": "dist/asset/icons",
+    "icon": "dist/assets/icons",
     "target": ["dmg"]
   },
   "linux": {

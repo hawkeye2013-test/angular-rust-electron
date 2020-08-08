@@ -48,6 +48,4 @@ Thumbs.db
 
 # electron-build
 release/
-
-
-# rust
+main.js.map

@@ -78,5 +78,5 @@ try {
   });
 } catch (e) {
   // Catch Error
-  console.log(e);
+  // console.log(e)
 }

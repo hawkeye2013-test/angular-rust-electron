@@ -48,4 +48,4 @@ Thumbs.db
 
 # electron-build
 release/
-main.js.map
+*.js.map

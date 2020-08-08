@@ -3,13 +3,16 @@ const path = require('path');
 const { stderr } = require('process');
 const { execSync } = require('child_process');
 
-const { parseCargoFile } = require('./buildSystem/parsers');
+const { parseCargoFile } = require('./parsers');
 
 const cwd = process.cwd();
 
 const exePath = path.join(cwd, 'executables');
 
 const exeDirs = fs.readdirSync(exePath);
+
+// make the destination directory
+fs.mkdirSync(path.join(process.cwd(), 'dist', 'executables'));
 
 exeDirs.forEach((exeDir) => {
   let configPath = path.join(exePath, exeDir, 'config.json');

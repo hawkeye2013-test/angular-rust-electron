@@ -59,51 +59,42 @@ exeDirs.forEach((exeDir) => {
           }
         );
 
-        switch (platform) {
-          case 'win32':
-            // Copy EXE to dist directory
-            let targetEXEwin = path.join(
-              exePath,
-              exeDir,
-              'target',
-              'release',
-              cargoFileContents.package.name + '.exe'
-            );
+        if (platform === 'win32') {
+          // Copy EXE to dist directory
+          let targetEXEwin = path.join(
+            exePath,
+            exeDir,
+            'target',
+            'release',
+            cargoFileContents.package.name + '.exe'
+          );
 
-            let toEXEwin = path.join(
-              cwd,
-              'tools',
-              cargoFileContents.package.name + '.exe'
-            );
+          let toEXEwin = path.join(
+            cwd,
+            'tools',
+            cargoFileContents.package.name + '.exe'
+          );
 
-            console.log(
-              `INFO: Copying File from ${targetEXEwin} to ${toEXEwin}`
-            );
-            fs.copyFileSync(targetEXEwin, toEXEwin);
-            break;
+          console.log(`INFO: Copying File from ${targetEXEwin} to ${toEXEwin}`);
+          fs.copyFileSync(targetEXEwin, toEXEwin);
+        } else {
+          // Copy Executable to dist directory
+          let targetEXEmac = path.join(
+            exePath,
+            exeDir,
+            'target',
+            'release',
+            cargoFileContents.package.name
+          );
 
-          case 'darwin':
-            // Copy Executable to dist directory
-            let targetEXEmac = path.join(
-              exePath,
-              exeDir,
-              'target',
-              'release',
-              cargoFileContents.package.name
-            );
+          let toEXEmac = path.join(
+            cwd,
+            'tools',
+            cargoFileContents.package.name
+          );
 
-            let toEXEmac = path.join(
-              cwd,
-              'tools',
-              cargoFileContents.package.name
-            );
-
-            console.log(
-              `INFO: Copying File from ${targetEXEmac} to ${toEXEmac}`
-            );
-            fs.copyFileSync(targetEXEmac, toEXEmac);
-
-            break;
+          console.log(`INFO: Copying File from ${targetEXEmac} to ${toEXEmac}`);
+          fs.copyFileSync(targetEXEmac, toEXEmac);
         }
 
         break;

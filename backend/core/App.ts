@@ -40,37 +40,17 @@ export default class App {
       });
       App.mainWindow.loadURL('http://localhost:4200');
     } else {
-      switch (process.platform) {
-        case 'win32':
-          App.mainWindow.loadURL(
-            url.format({
-              pathname: path.join(
-                process.cwd(),
-                'resources',
-                'app.asar',
-                'dist',
-                'index.html'
-              ),
-              protocol: 'file:',
-              slashes: true,
-            })
-          );
-          break;
-
-        case 'darwin':
-          App.mainWindow.loadURL(
-            url.format({
-              pathname: path.join(
-                App.application.getAppPath(),
-                'dist',
-                'index.html'
-              ),
-              protocol: 'file:',
-              slashes: true,
-            })
-          );
-          break;
-      }
+      App.mainWindow.loadURL(
+        url.format({
+          pathname: path.join(
+            App.application.getAppPath(),
+            'dist',
+            'index.html'
+          ),
+          protocol: 'file:',
+          slashes: true,
+        })
+      );
     }
     App.mainWindow.on('closed', App.onClose);
   }

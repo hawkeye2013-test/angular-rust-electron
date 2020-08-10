@@ -1,5 +1,5 @@
 {
   "build": true,
   "language": "rust",
-  "tooling": "cargo"
+  "tooling": "neon"
 }

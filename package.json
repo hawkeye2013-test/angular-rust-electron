@@ -25,15 +25,19 @@
     "ng:serve": "ng serve",
     "ng:serve:web": "ng serve -c web -o",
     "electron:serve-tsc": "tsc -p tsconfig-serve.json",
-    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --dev",
+    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && node ./buildSystem/buildexecutables.js && npx electron . --dev",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "node ./buildSystem/clean.js && npm run build:prod && node ./buildSystem/buildexecutables.js && electron-builder build",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "e2e": "npm run build:prod && cross-env TS_NODE_PROJECT='e2e/tsconfig.e2e.json' mocha --timeout 300000 --require ts-node/register e2e/**/*.e2e.ts",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "rebuild": "electron-build-env neon build thread-count --release"
   },
   "private": true,
+  "dependencies": {
+    "thread-count": "file:tools/thread-count"
+  },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.2",
     "@angular/animations": "~10.0.3",
@@ -53,6 +57,7 @@
     "codelyzer": "^6.0.0",
     "cross-env": "^7.0.2",
     "electron": "^9.2.0",
+    "electron-build-env": "^0.2.0",
     "electron-builder": "^22.8.0",
     "electron-reload": "^1.5.0",
     "fs-extra": "^9.0.1",
@@ -63,6 +68,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~3.3.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+    "neon-cli": "^0.4.0",
     "npm-run-all": "^4.1.5",
     "protractor": "~7.0.0",
     "rxjs": "~6.5.5",

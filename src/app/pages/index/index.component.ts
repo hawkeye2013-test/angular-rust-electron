@@ -12,6 +12,6 @@ export class IndexComponent implements OnInit {
   ngOnInit(): void {}
 
   buttonClicked(event: MouseEvent): void {
-    console.log('button clicked');
+    this.backendService.buttonClicked();
   }
 }

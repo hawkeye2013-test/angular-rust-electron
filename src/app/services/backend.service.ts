@@ -8,10 +8,9 @@ import { ElectronParent } from './electron-parent/electron-parent';
 export class BackendService extends ElectronParent {
   constructor() {
     super();
-    console.log(this.isElectron());
   }
 
-  triggerWindowClose(): void {
-    this.sendMessage('topbar:window:close');
+  buttonClicked(): void {
+    this.sendMessage('button::click');
   }
 }

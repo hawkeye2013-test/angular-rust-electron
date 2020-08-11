@@ -1,31 +1,27 @@
 const fs = require('fs');
 const path = require('path');
-const { stderr } = require('process');
-const { execSync, spawnSync } = require('child_process');
-
+const { execSync } = require('child_process');
+const chalk = require('chalk');
 const { parseCargoFile } = require('./parsers');
+const { info, error, warning, cpFile } = require('./helpers');
 
 const cwd = process.cwd();
 
 const exePath = path.join(cwd, 'executables');
-
 const exeDirs = fs.readdirSync(exePath);
-
 const platform = process.platform;
 
-console.log('PLATFORM: ', platform);
-
-// make the destination directory
-// fs.mkdirSync(path.join(process.cwd(), 'dist', 'executables'));
-
 exeDirs.forEach((exeDir) => {
+  info(`Processing Project: ${chalk.whiteBright(exeDir)}`);
+  console.log(`---------------------------------------------`);
+
   let configPath = path.join(exePath, exeDir, 'config.json');
 
   try {
     let config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
     if (config.build) {
-      console.log(
+      info(
         `Building ${path.join(
           exePath,
           exeDir,
@@ -44,12 +40,14 @@ exeDirs.forEach((exeDir) => {
               break;
 
             default:
-              console.log(`Unknown Tooling - ${config.tooling}`);
+              error(`Unknown Tooling - ${config.tooling}`);
               break;
           }
 
           break;
       }
+    } else {
+      warning('Build flag set to false - skipping build');
     }
   } catch (err) {
     switch (err.code) {
@@ -65,12 +63,15 @@ exeDirs.forEach((exeDir) => {
 
         break;
     }
+    process.exit(1);
   }
 });
 
 process.exit(0);
 
 function runCargoBuild(exePath, exeDir) {
+  info('Running With Cargo');
+
   // Get cargo info
   const cargoFileContents = parseCargoFile(
     path.join(exePath, exeDir, 'Cargo.toml')
@@ -85,53 +86,40 @@ function runCargoBuild(exePath, exeDir) {
     )}`,
     { encoding: 'utf-8' }
   );
-
   console.log(cargoProcess);
 
+  let targetDirFrom;
+  let targetDirTo;
+  let targetEXEName;
+
   if (platform === 'win32') {
-    // Copy EXE to dist directory
-    let targetEXEwin = path.join(
-      exePath,
-      exeDir,
-      'target',
-      'release',
-      cargoFileContents.package.name + '.exe'
-    );
+    targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-    let toEXEwin = path.join(
-      cwd,
-      'tools',
-      cargoFileContents.package.name,
-      cargoFileContents.package.name + '.exe'
-    );
+    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
 
-    if (
-      !fs.existsSync(path.join(cwd, 'tools', cargoFileContents.package.name))
-    ) {
-      fs.mkdirSync(path.join(cwd, 'tools', cargoFileContents.package.name));
-    }
-
-    console.log(`INFO: Copying File from ${targetEXEwin} to ${toEXEwin}`);
-    fs.copyFileSync(targetEXEwin, toEXEwin);
+    targetEXEName = cargoFileContents.package.name + '.exe';
   } else {
     // Copy Executable to dist directory
-    let targetEXEmac = path.join(
-      exePath,
-      exeDir,
-      'target',
-      'release',
-      cargoFileContents.package.name
-    );
+    targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-    let toEXEmac = path.join(cwd, 'tools', cargoFileContents.package.name);
+    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
 
-    console.log(`INFO: Copying File from ${targetEXEmac} to ${toEXEmac}`);
-    fs.copyFileSync(targetEXEmac, toEXEmac);
+    targetEXEName = cargoFileContents.package.name;
   }
+
+  if (!fs.existsSync(targetDirTo)) {
+    info(`Directory ${targetDirTo} does not exist, creating it now.`);
+    fs.mkdirSync(targetDirTo);
+  }
+
+  cpFile(
+    path.join(targetDirFrom, targetEXEName),
+    path.join(targetDirTo, targetEXEName)
+  );
 }
 
 function runNeonBuild(exePath, exeDir) {
-  console.log('Running with neon');
+  info('Running With Neon');
 
   const neonProcess = execSync(
     `cd ${path.join(exePath, exeDir)} && neon build --release`,
@@ -143,36 +131,34 @@ function runNeonBuild(exePath, exeDir) {
   // TODO(TUCKER) - add some error handling here if there are mistakes
   console.log(neonProcess);
 
-  if (!fs.existsSync(path.join(cwd, 'tools', exeDir))) {
-    fs.mkdirSync(path.join(cwd, 'tools', exeDir));
+  let projectDirTo = path.join(cwd, 'tools', exeDir);
+
+  let projectDirFrom = path.join(exePath, exeDir);
+
+  if (!fs.existsSync(projectDirTo)) {
+    fs.mkdirSync(projectDirTo);
   }
 
-  if (!fs.existsSync(path.join(cwd, 'tools', exeDir, 'lib'))) {
-    fs.mkdirSync(path.join(cwd, 'tools', exeDir, 'lib'));
+  if (!fs.existsSync(path.join(projectDirTo, 'lib'))) {
+    fs.mkdirSync(path.join(projectDirTo, 'lib'));
   }
 
-  if (!fs.existsSync(path.join(cwd, 'tools', exeDir, 'native'))) {
-    fs.mkdirSync(path.join(cwd, 'tools', exeDir, 'native'));
+  if (!fs.existsSync(path.join(projectDirTo, 'native'))) {
+    fs.mkdirSync(path.join(projectDirTo, 'native'));
   }
 
-  let targetPkgFileFrom = path.join(exePath, exeDir, 'package.json');
-  let targetPkgFileTo = path.join(cwd, 'tools', exeDir, 'package.json');
-
-  fs.copyFileSync(targetPkgFileFrom, targetPkgFileTo);
-
-  let targetLibFileFrom = path.join(exePath, exeDir, 'lib', 'index.js');
-  let targetLibFileTo = path.join(cwd, 'tools', exeDir, 'lib', 'index.js');
-
-  fs.copyFileSync(targetLibFileFrom, targetLibFileTo);
-
-  let targetNodeFileFrom = path.join(exePath, exeDir, 'native', 'index.node');
-  let targetNodeFileTo = path.join(
-    cwd,
-    'tools',
-    exeDir,
-    'native',
-    'index.node'
+  cpFile(
+    path.join(projectDirFrom, 'package.json'),
+    path.join(projectDirTo, 'package.json')
   );
 
-  fs.copyFileSync(targetNodeFileFrom, targetNodeFileTo);
+  cpFile(
+    path.join(projectDirFrom, 'lib', 'index.js'),
+    path.join(projectDirTo, 'lib', 'index.js')
+  );
+
+  cpFile(
+    path.join(projectDirFrom, 'native', 'index.node'),
+    path.join(projectDirTo, 'native', 'index.node')
+  );
 }

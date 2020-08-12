@@ -10,6 +10,11 @@ const cwd = process.cwd();
 const exePath = path.join(cwd, 'executables');
 const exeDirs = fs.readdirSync(exePath);
 const platform = process.platform;
+let packageJSON = JSON.parse(
+  fs.readFileSync(path.join(cwd, 'package.json'), 'utf-8')
+);
+
+console.log(packageJSON.dependencies);
 
 exeDirs.forEach((exeDir) => {
   info(`Processing Project: ${chalk.whiteBright(exeDir)}`);
@@ -122,7 +127,7 @@ function runNeonBuild(exePath, exeDir) {
   info('Running With Neon');
 
   const neonProcess = execSync(
-    `cd ${path.join(exePath, exeDir)} && neon build --release`,
+    `npx electron-build-env neon build ${exeDir} --release`,
     {
       encoding: 'utf-8',
     }

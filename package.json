@@ -16,6 +16,7 @@
     "typescript"
   ],
   "scripts": {
+    "install": "npx electron-build-env neon build thread-count --release",
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "npm-run-all -p electron:serve ng:serve",
@@ -25,18 +26,17 @@
     "ng:serve": "ng serve",
     "ng:serve:web": "ng serve -c web -o",
     "electron:serve-tsc": "tsc -p tsconfig-serve.json",
-    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && node ./buildSystem/buildexecutables.js && npx electron . --dev",
+    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --dev",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "node ./buildSystem/clean.js && npm run build:prod && node ./buildSystem/buildexecutables.js && electron-builder build",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "e2e": "npm run build:prod && cross-env TS_NODE_PROJECT='e2e/tsconfig.e2e.json' mocha --timeout 300000 --require ts-node/register e2e/**/*.e2e.ts",
-    "lint": "ng lint",
-    "rebuild": "electron-build-env neon build thread-count --release"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
-    "thread-count": "file:tools/thread-count"
+    "thread-count": "file:executables/thread-count"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.2",

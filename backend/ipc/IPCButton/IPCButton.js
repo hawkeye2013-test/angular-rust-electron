@@ -12,7 +12,7 @@ var IPCButton = /** @class */ (function () {
     };
     IPCButton.prototype.handleButtonClick = function (event, args) {
         console.log('Handle Button Click');
-        console.log(event, args);
+        // console.log(event, args);
         console.log(threadCount());
     };
     return IPCButton;

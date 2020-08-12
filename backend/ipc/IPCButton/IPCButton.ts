@@ -13,7 +13,7 @@ export class IPCButton {
 
   handleButtonClick(event: IpcMainEvent, args: any) {
     console.log('Handle Button Click');
-    console.log(event, args);
+    // console.log(event, args);
     console.log(threadCount());
   }
 }

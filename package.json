@@ -7,7 +7,7 @@
     "name": "Tucker Hawkinson",
     "email": "hawkinson.npm@gmail.com"
   },
-  "main": "main.js",
+  "main": "dist-backend/main.js",
   "keywords": [
     "angular",
     "angular 10",

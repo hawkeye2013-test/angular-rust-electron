@@ -1,5 +1,5 @@
 {
-  "build": false,
+  "build": true,
   "language": "rust",
   "tooling": "cargo"
 }

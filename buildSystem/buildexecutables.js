@@ -3,9 +3,8 @@ const path = require('path');
 const { execSync } = require('child_process');
 const chalk = require('chalk');
 const { parseCargoFile } = require('./parsers');
-const { info, error, warning, cpFile } = require('./helpers');
-
-const { runCargoBuild } = require('./cargoBuild');
+const { info, error, warning, cpFile, success } = require('./helpers');
+const { runCargoBuild, runNeonBuild } = require('./Builders');
 
 const cwd = process.cwd();
 
@@ -38,7 +37,7 @@ exeDirs.forEach((exeDir) => {
               break;
 
             case 'neon':
-              runNeonBuild(exePath, exeDir);
+              buildWithNeon(exePath, exeDir);
               break;
 
             default:
@@ -67,6 +66,8 @@ exeDirs.forEach((exeDir) => {
     }
     process.exit(1);
   }
+
+  success(`Build Completed for ${exeDir}\n\n`);
 });
 
 process.exit(0);
@@ -79,84 +80,48 @@ function buildWithCargo(exePath, exeDir) {
     path.join(exePath, exeDir, 'Cargo.toml')
   );
 
-  runCargoBuild(path.join(exePath, exeDir, 'Cargo.toml'))
-    .then((data) => {
-      // Build EXE
-      // let cargoProcess = execSync(
-      //   `cargo build --release --manifest-path=${path.join(
-      //     exePath,
-      //     exeDir,
-      //     'Cargo.toml'
-      //   )}`,
-      //   {
-      //     encoding: 'utf-8',
-      //   }
-      // );
-      // console.log(cargoProcess);
+  runCargoBuild(path.join(exePath, exeDir, 'Cargo.toml'));
 
-      let targetDirFrom;
-      let targetDirTo;
-      let targetEXEName;
+  let targetDirFrom;
+  let targetDirTo;
+  let targetEXEName;
 
-      if (platform === 'win32') {
-        targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
+  if (platform === 'win32') {
+    targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-        targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
+    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
 
-        targetEXEName = cargoFileContents.package.name + '.exe';
-      } else {
-        // Copy Executable to dist directory
-        targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
+    targetEXEName = cargoFileContents.package.name + '.exe';
+  } else {
+    // Copy Executable to dist directory
+    targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-        targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
+    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
 
-        targetEXEName = cargoFileContents.package.name;
-      }
+    targetEXEName = cargoFileContents.package.name;
+  }
 
-      if (!fs.existsSync(targetDirTo)) {
-        info(`Directory ${targetDirTo} does not exist, creating it now.`);
-        fs.mkdirSync(targetDirTo);
-      }
+  if (!fs.existsSync(targetDirTo)) {
+    info(`Directory ${targetDirTo} does not exist, creating it now.`);
+    fs.mkdirSync(targetDirTo);
+  }
 
-      cpFile(
-        path.join(targetDirFrom, targetEXEName),
-        path.join(targetDirTo, targetEXEName)
-      );
-    })
-    .catch((err) => {});
+  cpFile(
+    path.join(targetDirFrom, targetEXEName),
+    path.join(targetDirTo, targetEXEName)
+  );
 }
 
-function runNeonBuild(exePath, exeDir) {
+function buildWithNeon(exePath, exeDir) {
   info('Running With Neon');
 
-  const neonProcess = execSync(
-    `cd ${path.join(
-      exePath,
-      exeDir
-    )} && npx electron-build-env neon build --release`,
-    {
-      encoding: 'utf-8',
-    }
-  );
-
-  // TODO(TUCKER) - add some error handling here if there are mistakes
-  console.log(neonProcess);
+  runNeonBuild(path.join(exePath, exeDir));
 
   let projectDirTo = path.join(cwd, 'tools', exeDir);
 
   let projectDirFrom = path.join(exePath, exeDir);
 
-  if (!fs.existsSync(projectDirTo)) {
-    fs.mkdirSync(projectDirTo);
-  }
-
-  if (!fs.existsSync(path.join(projectDirTo, 'lib'))) {
-    fs.mkdirSync(path.join(projectDirTo, 'lib'));
-  }
-
-  if (!fs.existsSync(path.join(projectDirTo, 'native'))) {
-    fs.mkdirSync(path.join(projectDirTo, 'native'));
-  }
+  makeDirs(projectDirTo);
 
   cpFile(
     path.join(projectDirFrom, 'package.json'),
@@ -172,4 +137,18 @@ function runNeonBuild(exePath, exeDir) {
     path.join(projectDirFrom, 'native', 'index.node'),
     path.join(projectDirTo, 'native', 'index.node')
   );
+}
+
+function makeDirs(projectDirTo) {
+  if (!fs.existsSync(projectDirTo)) {
+    fs.mkdirSync(projectDirTo);
+  }
+
+  if (!fs.existsSync(path.join(projectDirTo, 'lib'))) {
+    fs.mkdirSync(path.join(projectDirTo, 'lib'));
+  }
+
+  if (!fs.existsSync(path.join(projectDirTo, 'native'))) {
+    fs.mkdirSync(path.join(projectDirTo, 'native'));
+  }
 }

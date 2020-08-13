@@ -15,6 +15,10 @@ const warning = (exports.warning = function (contentToPrint) {
   console.log(`${chalk.yellowBright(`WARNING::${contentToPrint}`)}`);
 });
 
+const success = (exports.success = function (contentToPrint) {
+  console.log(`${chalk.greenBright(`SUCCESS::${contentToPrint}`)}`);
+});
+
 exports.cpFile = function (fromFile, toFile) {
   info(`Copying File from ${fromFile} to ${toFile}`);
 

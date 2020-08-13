@@ -16,7 +16,7 @@ export class IPCButton {
     console.log('Handle Button Click');
     const threadCount = require(path.join(
       new EXEBridge().getLocation(),
-      'thread-count2'
+      'thread-count'
     ));
 
     App.mainWindow.webContents.send(

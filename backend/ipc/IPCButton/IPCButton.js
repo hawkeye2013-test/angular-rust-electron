@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IPCButton = void 0;
 var electron_1 = require("electron");
-var threadCount = require('../../../tools/thread-count');
+var threadCount = require('../../../tools/thread-count2');
 var IPCButton = /** @class */ (function () {
     function IPCButton() {
         this.watchIPCChannels();

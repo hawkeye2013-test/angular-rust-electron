@@ -16,7 +16,6 @@
     "typescript"
   ],
   "scripts": {
-    "install": "npx electron-build-env neon build thread-count --release",
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "run-s build:exe dev:serve",
@@ -39,9 +38,6 @@
     "lint": "ng lint"
   },
   "private": true,
-  "dependencies": {
-    "thread-count": "file:executables/thread-count"
-  },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.2",
     "@angular/animations": "~10.0.3",

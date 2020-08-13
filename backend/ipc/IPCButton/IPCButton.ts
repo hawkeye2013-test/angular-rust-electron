@@ -1,6 +1,6 @@
 import { ipcMain, IpcMainEvent } from 'electron';
 import App from '../../core/App';
-const threadCount = require('../../../tools/thread-count');
+const threadCount = require('../../../tools/thread-count2');
 
 export class IPCButton {
   constructor() {

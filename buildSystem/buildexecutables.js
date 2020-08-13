@@ -5,16 +5,13 @@ const chalk = require('chalk');
 const { parseCargoFile } = require('./parsers');
 const { info, error, warning, cpFile } = require('./helpers');
 
+const { runCargoBuild } = require('./cargoBuild');
+
 const cwd = process.cwd();
 
 const exePath = path.join(cwd, 'executables');
 const exeDirs = fs.readdirSync(exePath);
 const platform = process.platform;
-let packageJSON = JSON.parse(
-  fs.readFileSync(path.join(cwd, 'package.json'), 'utf-8')
-);
-
-console.log(packageJSON.dependencies);
 
 exeDirs.forEach((exeDir) => {
   info(`Processing Project: ${chalk.whiteBright(exeDir)}`);
@@ -37,7 +34,7 @@ exeDirs.forEach((exeDir) => {
         case 'rust':
           switch (config.tooling) {
             case 'cargo':
-              runCargoBuild(exePath, exeDir);
+              buildWithCargo(exePath, exeDir);
               break;
 
             case 'neon':
@@ -74,7 +71,7 @@ exeDirs.forEach((exeDir) => {
 
 process.exit(0);
 
-function runCargoBuild(exePath, exeDir) {
+function buildWithCargo(exePath, exeDir) {
   info('Running With Cargo');
 
   // Get cargo info
@@ -82,52 +79,61 @@ function runCargoBuild(exePath, exeDir) {
     path.join(exePath, exeDir, 'Cargo.toml')
   );
 
-  // Build EXE
-  let cargoProcess = execSync(
-    `cargo build --release --manifest-path=${path.join(
-      exePath,
-      exeDir,
-      'Cargo.toml'
-    )}`,
-    { encoding: 'utf-8' }
-  );
-  console.log(cargoProcess);
+  runCargoBuild(path.join(exePath, exeDir, 'Cargo.toml'))
+    .then((data) => {
+      // Build EXE
+      // let cargoProcess = execSync(
+      //   `cargo build --release --manifest-path=${path.join(
+      //     exePath,
+      //     exeDir,
+      //     'Cargo.toml'
+      //   )}`,
+      //   {
+      //     encoding: 'utf-8',
+      //   }
+      // );
+      // console.log(cargoProcess);
 
-  let targetDirFrom;
-  let targetDirTo;
-  let targetEXEName;
+      let targetDirFrom;
+      let targetDirTo;
+      let targetEXEName;
 
-  if (platform === 'win32') {
-    targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
+      if (platform === 'win32') {
+        targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
+        targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
 
-    targetEXEName = cargoFileContents.package.name + '.exe';
-  } else {
-    // Copy Executable to dist directory
-    targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
+        targetEXEName = cargoFileContents.package.name + '.exe';
+      } else {
+        // Copy Executable to dist directory
+        targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
+        targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
 
-    targetEXEName = cargoFileContents.package.name;
-  }
+        targetEXEName = cargoFileContents.package.name;
+      }
 
-  if (!fs.existsSync(targetDirTo)) {
-    info(`Directory ${targetDirTo} does not exist, creating it now.`);
-    fs.mkdirSync(targetDirTo);
-  }
+      if (!fs.existsSync(targetDirTo)) {
+        info(`Directory ${targetDirTo} does not exist, creating it now.`);
+        fs.mkdirSync(targetDirTo);
+      }
 
-  cpFile(
-    path.join(targetDirFrom, targetEXEName),
-    path.join(targetDirTo, targetEXEName)
-  );
+      cpFile(
+        path.join(targetDirFrom, targetEXEName),
+        path.join(targetDirTo, targetEXEName)
+      );
+    })
+    .catch((err) => {});
 }
 
 function runNeonBuild(exePath, exeDir) {
   info('Running With Neon');
 
   const neonProcess = execSync(
-    `npx electron-build-env neon build ${exeDir} --release`,
+    `cd ${path.join(
+      exePath,
+      exeDir
+    )} && npx electron-build-env neon build --release`,
     {
       encoding: 'utf-8',
     }

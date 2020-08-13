@@ -1,4 +1,4 @@
 {
-  "exeSource": "src-exe",
-  "exeDest": "tools"
+  "exeSrc": "src-exe",
+  "exeDest": "dist-exe"
 }

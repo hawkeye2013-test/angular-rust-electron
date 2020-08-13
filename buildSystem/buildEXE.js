@@ -8,7 +8,12 @@ const { runCargoBuild, runNeonBuild } = require('./Builders');
 
 const cwd = process.cwd();
 
-const exePath = path.join(cwd, 'executables');
+let buildConfig = JSON.parse(
+  fs.readFileSync(path.join(cwd, 'build.config.json'), 'utf-8')
+);
+
+const exePath = path.join(cwd, buildConfig.exeSrc);
+const exeDest = path.join(cwd, buildConfig.exeDest);
 const exeDirs = fs.readdirSync(exePath);
 const platform = process.platform;
 
@@ -89,14 +94,14 @@ function buildWithCargo(exePath, exeDir) {
   if (platform === 'win32') {
     targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
+    targetDirTo = path.join(exeDest, cargoFileContents.package.name);
 
     targetEXEName = cargoFileContents.package.name + '.exe';
   } else {
     // Copy Executable to dist directory
     targetDirFrom = path.join(exePath, exeDir, 'target', 'release');
 
-    targetDirTo = path.join(cwd, 'tools', cargoFileContents.package.name);
+    targetDirTo = path.join(exeDest, cargoFileContents.package.name);
 
     targetEXEName = cargoFileContents.package.name;
   }
@@ -117,7 +122,7 @@ function buildWithNeon(exePath, exeDir) {
 
   runNeonBuild(path.join(exePath, exeDir));
 
-  let projectDirTo = path.join(cwd, 'tools', exeDir);
+  let projectDirTo = path.join(exeDest, exeDir);
 
   let projectDirFrom = path.join(exePath, exeDir);
 

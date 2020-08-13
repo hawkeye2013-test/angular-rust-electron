@@ -23,7 +23,7 @@
     "build": "npm run electron:serve-tsc && ng build --base-href ./",
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
-    "build:exe": "node ./buildSystem/buildexecutables.js",
+    "build:exe": "node ./buildSystem/buildEXE.js",
     "build:clean": "node ./buildSystem/clean.js",
     "ng:serve": "ng serve",
     "ng:serve:web": "ng serve -c web -o",

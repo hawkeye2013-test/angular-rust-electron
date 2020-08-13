@@ -1,7 +1,7 @@
 const fse = require('fs-extra');
 const fs = require('fs');
 const path = require('path');
-const { info } = require('./helpers');
+const { info } = require('./resources/helpers');
 
 const cwd = process.cwd();
 

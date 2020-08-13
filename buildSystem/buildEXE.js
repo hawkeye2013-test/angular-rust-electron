@@ -2,9 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const chalk = require('chalk');
-const { parseCargoFile } = require('./parsers');
-const { info, error, warning, cpFile, success } = require('./helpers');
-const { runCargoBuild, runNeonBuild } = require('./Builders');
+const { parseCargoFile } = require('./resources/parsers');
+const {
+  info,
+  error,
+  warning,
+  cpFile,
+  success,
+} = require('./resources/helpers');
+const { runCargoBuild, runNeonBuild } = require('./resources/Builders');
 
 const cwd = process.cwd();
 
@@ -104,6 +110,11 @@ function buildWithCargo(exePath, exeDir) {
     targetDirTo = path.join(exeDest, cargoFileContents.package.name);
 
     targetEXEName = cargoFileContents.package.name;
+  }
+
+  if (!fs.existsSync(exeDest)) {
+    info(`Directory ${exeDest} does not exist, creating it now.`);
+    fs.mkdirSync(exeDest);
   }
 
   if (!fs.existsSync(targetDirTo)) {

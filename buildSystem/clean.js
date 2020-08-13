@@ -11,13 +11,26 @@ let buildConfig = JSON.parse(
 
 const exeDest = path.join(cwd, buildConfig.exeDest);
 
-info(`Cleaning folder: ${path.join(process.cwd(), 'dist')}`);
-fse.emptyDirSync(path.join(process.cwd(), 'dist'));
+const dist = path.join(process.cwd(), 'dist');
+
+info(`Cleaning folder: ${dist}`);
+fse.emptyDirSync(dist);
+fse.removeSync(dist);
+
+const distBackend = path.join(process.cwd(), 'dist-backend');
+
+info(`Cleaning folder: ${distBackend}`);
+fse.emptyDirSync(distBackend);
+fse.removeSync(distBackend);
 
 info(`Cleaning folder: ${exeDest}`);
 fse.emptyDirSync(exeDest);
+fse.removeSync(exeDest);
 
-info(`Cleaning folder: ${path.join(process.cwd(), 'release')}`);
-fse.emptyDirSync(path.join(process.cwd(), 'release'));
+const release = path.join(process.cwd(), 'release');
+
+info(`Cleaning folder: ${release}`);
+fse.emptyDirSync(release);
+fse.removeSync(release);
 
 process.exit(0);

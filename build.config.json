@@ -1,4 +1,4 @@
 {
-  "exeSource": "executables",
+  "exeSource": "src-exe",
   "exeDest": "tools"
 }

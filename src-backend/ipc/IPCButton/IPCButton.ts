@@ -1,6 +1,7 @@
 import { ipcMain, IpcMainEvent } from 'electron';
+import * as path from 'path';
+import { EXEBridge } from '../../exeBridge/EXEBridge';
 import App from '../../core/App';
-const threadCount = require('../../../tools/thread-count2');
 
 export class IPCButton {
   constructor() {
@@ -13,7 +14,15 @@ export class IPCButton {
 
   handleButtonClick(event: IpcMainEvent, args: any) {
     console.log('Handle Button Click');
-    // console.log(event, args);
+    const threadCount = require(path.join(
+      new EXEBridge().getLocation(),
+      'thread-count2'
+    ));
+
+    App.mainWindow.webContents.send(
+      'app-data',
+      `CPU Threads: ${threadCount()}`
+    );
     console.log(threadCount());
   }
 }

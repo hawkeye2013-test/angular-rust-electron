@@ -5,6 +5,9 @@ export class ElectronParent {
   constructor() {
     if (this.isElectron()) {
       this.ipcRenderer = window.require('electron').ipcRenderer;
+      this.ipcRenderer.on('app-data', (event, args) => {
+        console.log(event, args);
+      });
     }
   }
 

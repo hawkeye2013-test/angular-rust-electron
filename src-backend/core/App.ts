@@ -2,6 +2,7 @@ import { IpcController } from '../ipc/IpcController';
 import { BrowserWindow } from 'electron';
 import * as url from 'url';
 import * as path from 'path';
+import { EXEBridge } from '../exeBridge/EXEBridge';
 
 let isDevEnv = false;
 export default class App {
@@ -22,7 +23,6 @@ export default class App {
   }
 
   private static onReady(): void {
-    console.log(isDevEnv);
     App.mainWindow = new App.BrowserWindow({
       width: 1200,
       height: 800,
@@ -52,6 +52,16 @@ export default class App {
         })
       );
     }
+
+    App.mainWindow.webContents.on('dom-ready', () => {
+      setInterval(() => {
+        App.mainWindow.webContents.send(
+          'app-data',
+          path.join(new EXEBridge().getLocation(), 'thread-count2')
+        );
+      }, 10000);
+    });
+
     App.mainWindow.on('closed', App.onClose);
   }
 
@@ -67,5 +77,9 @@ export default class App {
 
     App.application.on('window-all-closed', App.onWindowAllClosed);
     App.application.on('ready', App.onReady);
+  }
+
+  public static getDevEnv() {
+    return isDevEnv;
   }
 }

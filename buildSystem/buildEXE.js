@@ -156,15 +156,32 @@ function buildWithNeon(exePath, exeDir) {
 }
 
 function makeDirs(projectDirTo) {
-  if (!fs.existsSync(projectDirTo)) {
-    fs.mkdirSync(projectDirTo);
-  }
+  try {
+    let parentDir = getParentDirectory(projectDirTo);
 
-  if (!fs.existsSync(path.join(projectDirTo, 'lib'))) {
-    fs.mkdirSync(path.join(projectDirTo, 'lib'));
-  }
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir);
+    }
 
-  if (!fs.existsSync(path.join(projectDirTo, 'native'))) {
-    fs.mkdirSync(path.join(projectDirTo, 'native'));
+    if (!fs.existsSync(projectDirTo)) {
+      fs.mkdirSync(projectDirTo);
+    }
+
+    if (!fs.existsSync(path.join(projectDirTo, 'lib'))) {
+      fs.mkdirSync(path.join(projectDirTo, 'lib'));
+    }
+
+    if (!fs.existsSync(path.join(projectDirTo, 'native'))) {
+      fs.mkdirSync(path.join(projectDirTo, 'native'));
+    }
+  } catch (err) {
+    console.log(err);
   }
+}
+
+function getParentDirectory(directory) {
+  const splitDirs = directory.split(path.sep);
+  splitDirs.pop();
+
+  return splitDirs.join(path.sep);
 }

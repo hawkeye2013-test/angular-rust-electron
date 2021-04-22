@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "lib/index.js",
-  "author": "Tucker Hawkinson <hawkinson.tucker@gmail.com>",
+  "author": "Tucker Hawkinson <hawkinson.npm@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "neon-cli": "^0.4.0"

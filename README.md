@@ -81,3 +81,5 @@ If the problem is an Electron load error, try deleting the `electron` directory 
 ### Resources
 
 Build system based on a highly modified version of [Angular-Electron by miximegris](https://github.com/maximegris/angular-electron). Check it out if you just need the Angular Electron portion!
+
+README UPDATE
